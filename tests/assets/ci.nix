@@ -1,6 +1,4 @@
-{
-  system ? "x86_64-linux",
-}:
+{ pkgs ? import <nixpkgs> {}, lib ? pkgs.lib, system ? builtins.currentSystem }:
 
 let
   dep-a = derivation {

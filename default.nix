@@ -1,9 +1,4 @@
-{
-  stdenv,
-  lib,
-  nixComponents,
-  pkgs,
-}:
+{ pkgs, lib, stdenv ? pkgs.stdenv, nixComponents ? {} }:
 
 let
   revision = "0";

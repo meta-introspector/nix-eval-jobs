@@ -15,7 +15,7 @@
   ),
   stdenv ? pkgs.stdenv,
   lib ? pkgs.lib,
-  nixComponents,
+  nixComponents ? {},
 }:
 
 let
