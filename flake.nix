@@ -3,16 +3,18 @@
 
   # Switch back after https://nixpk.gs/pr-tracker.html?pr=396710 is finished
   # inputs.nixpkgs.url = "https://nixos.org/channels/nixpkgs-unstable/nixexprs.tar.xz";
-  inputs.nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
-  inputs.nix = {
-    url = "github:meta-introspector/nix?ref=feature/CRQ-016-nixify";
-    # We want to control the deps precisely
-    flake = false;
+  inputs = {
+    nixpkgs.url = "github:meta-introspector/nixpkgs?ref=feature/CRQ-016-nixify";
+    nix = {
+      url = "github:meta-introspector/nix?ref=feature/CRQ-016-nixify";
+      # We want to control the deps precisely
+      flake = false;
+    };
+    flake-parts.url = "github:meta-introspector/flake-parts?ref=feature/CRQ-016-nixify";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    treefmt-nix.url = "github:meta-introspector/treefmt-nix?ref=feature/CRQ-016-nixify";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.flake-parts.url = "github:meta-introspector/flake-parts?ref=feature/CRQ-016-nixify";
-  inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-  inputs.treefmt-nix.url = "github:meta-introspector/treefmt-nix?ref=feature/CRQ-016-nixify";
-  inputs.treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 
   outputs =
     inputs@{ flake-parts, ... }:
@@ -54,11 +56,13 @@
         in
         {
           treefmt.imports = [ ./dev/treefmt.nix ];
-          packages.nix-eval-jobs = pkgs.callPackage ./default.nix drvArgs;
-          packages.clangStdenv-nix-eval-jobs = pkgs.callPackage ./default.nix (
-            drvArgs // { stdenv = pkgs.clangStdenv; }
-          );
-          packages.default = self'.packages.nix-eval-jobs;
+          packages = {
+            nix-eval-jobs = pkgs.callPackage ./default.nix drvArgs;
+            clangStdenv-nix-eval-jobs = pkgs.callPackage ./default.nix (
+              drvArgs // { stdenv = pkgs.clangStdenv; }
+            );
+            default = self'.packages.nix-eval-jobs;
+          };
           devShells.default = pkgs.callPackage ./shell.nix drvArgs;
           devShells.clang = pkgs.callPackage ./shell.nix (drvArgs // { stdenv = pkgs.clangStdenv; });
 
